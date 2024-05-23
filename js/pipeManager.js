@@ -4,18 +4,19 @@ export class PipeManager {
     constructor(game) {
         this.game = game;
         this.pipes = [];
-        this.pipeGap = 150; // Odstęp między rurami (od góry do dołu)
-        this.pipeFrequency = 100; // Jak często tworzyć nowe rury (w klatkach)
+        this.pipeGap = 500; // Odstęp między rurami (od góry do dołu)
+        this.pipeFrequency = 140; // Jak często tworzyć nowe rury (w klatkach)
         this.frame = 0;
+        this.baseHeight = 80
     }
 
     update() {
         this.frame++;
 
         if (this.frame % this.pipeFrequency === 0) {
-            const gapY = Math.floor(Math.random() * (this.game.height - this.pipeGap));
-            const topPipe = new Pipe(this.game, 0, gapY, true);
-            const bottomPipe = new Pipe(this.game, gapY + this.pipeGap, this.game.height - (gapY + this.pipeGap), false);
+            const gapY = Math.floor((Math.random() * 3 - 3) * 100);
+            const topPipe = new Pipe(this.game, this.game.width, gapY, true);
+            const bottomPipe = new Pipe(this.game, this.game.width, gapY + this.pipeGap, false);
             this.pipes.push(topPipe);
             this.pipes.push(bottomPipe);
         }
@@ -26,5 +27,7 @@ export class PipeManager {
 
     draw(context) {
         this.pipes.forEach(pipe => pipe.draw(context));
+        const baseImage = document.getElementById('base');
+        context.drawImage(baseImage, 0, this.game.height - this.baseHeight, this.game.width, this.baseHeight);
     }
 }

@@ -17,7 +17,7 @@ export class Player{
         }
 
         if (input.includes(' ') && !this.spacePressed){
-            this.fallSpeed = -14;
+            this.fallSpeed = -10;
             this.spacePressed = true;
         } else if (!input.includes(' ')) {
             this.spacePressed = false; // Zresetowanie stanu spacji, jeśli spacja nie jest wciśnięta

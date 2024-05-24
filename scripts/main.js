@@ -3,6 +3,8 @@ import { InputHandler } from './input.js';
 import { Background } from './background.js';
 import { PipeManager } from './pipeManager.js';
 
+
+
 window.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('canvas1');
     const ctx = canvas.getContext('2d');
@@ -14,13 +16,13 @@ window.addEventListener('DOMContentLoaded', function() {
 
     const pointSound = document.getElementById('pointSound');
     const hitSound = document.getElementById('hitSound');
+    const resetSound = document.getElementById('resetSound');
 
     let game;
     let gameStarted = false;
     let input = new InputHandler();
     let gameOverScreen = document.getElementById('gameOver');
     let startScreen = document.getElementById('message');
-    let highScore = parseInt(localStorage.getItem('flappy_bird_high_score')) || 0;
 
     class Game {
         constructor(width, height) {
@@ -30,25 +32,24 @@ window.addEventListener('DOMContentLoaded', function() {
             this.player = new Player(this);
             this.pipeManager = new PipeManager(this);
             this.score = 0;
-            this.highScore = highScore;
-            this.initializeUI();
-        }
-
-        initializeUI() {
-            const resetButton = document.getElementById('resetButton');
-            resetButton.addEventListener('click', () => {
-                this.resetHighScore();
-            });
+            this.pipeSpeed = 1;
+            this.initializeHighScore(); // Wczytaj rekord gracza
         }
 
         resetHighScore() {
+            localStorage.setItem('flappy_bird_high_score', 0);
             this.highScore = 0;
-            localStorage.setItem('flappy_bird_high_score', this.highScore);
-            this.updateUI();
         }
 
-        updateUI() {
-            // Tutaj możesz zaktualizować interfejs użytkownika
+        updateHighScoreDisplay() {
+            if (this.score > this.highScore) {
+                this.highScore = this.score;
+                localStorage.setItem('flappy_bird_high_score', this.highScore);
+            }
+        }
+
+        initializeHighScore() {
+            this.highScore = parseInt(localStorage.getItem('flappy_bird_high_score')) || 0;
         }
 
         playPointSound() {
@@ -61,9 +62,14 @@ window.addEventListener('DOMContentLoaded', function() {
             hitSound.play();
         }
 
+        playResetSound() {
+        resetSound.currentTime = 0;
+        resetSound.play();
+        }
+
         update() {
             this.player.update(input.keys);
-            this.pipeManager.update();
+            this.pipeManager.update(this);
             this.checkCollisions();
         }
 
@@ -75,7 +81,7 @@ window.addEventListener('DOMContentLoaded', function() {
             context.font = '30px Arial';
             context.textAlign = 'center';
             context.fillText(`Score: ${this.score}`, this.width / 2, 50);
-            context.fillText(`High Score: ${this.highScore}`, this.width / 2, 100);
+            context.fillText(`Best: ${this.highScore}`, this.width / 2, 100);
         }
 
         checkCollisions() {
@@ -84,6 +90,11 @@ window.addEventListener('DOMContentLoaded', function() {
                     this.score += 1 / 2;
                     this.playPointSound();
                     pipe.scored = true;
+    
+                    //Zwiększanie prędkości rur po zdobyciu punktu przez gracza
+                    if (this.score % 2 === 0) {
+                        this.increasePipeSpeed();
+                    }
                 } else if (this.player && pipe && this.checkCollision(this.player, pipe)) {
                     this.playHitSound();
                     this.gameOver();
@@ -99,6 +110,13 @@ window.addEventListener('DOMContentLoaded', function() {
                 player.y + player.height > pipe.y
             );
         }
+
+        increasePipeSpeed() {
+            // Zwiększamy prędkość rur
+            this.pipeSpeed += 0.05; // Możesz dostosować wartość przyspieszenia
+            console.log("Zwiększono prędkość rur:", this.pipeSpeed);
+        }
+    
 
         clear() {
             this.background = null;
@@ -121,6 +139,7 @@ window.addEventListener('DOMContentLoaded', function() {
             window.addEventListener('keydown', this.handleKeyDown.bind(this));
         }
 
+
         handleKeyDown(event) {
             if (event.code === 'Space' && !gameStarted) {
                 startScreen.style.display = 'none';
@@ -132,25 +151,22 @@ window.addEventListener('DOMContentLoaded', function() {
 
         gameOver() {
             gameStarted = false;
+            this.updateHighScoreDisplay();
             gameOverScreen.style.display = 'block';
             soundtrack.pause();
             this.pauseGame();
             this.clear();
-
+        
             const handleKeyPress = (event) => {
                 if (event.code === 'Space') {
                     document.removeEventListener('keydown', handleKeyPress);
                     this.startGame();
                 }
             };
-
+        
             document.addEventListener('keydown', handleKeyPress);
-
-            // Aktualizacja rekordu gracza
-            if (this.score > this.highScore) {
-                this.highScore = this.score;
-                localStorage.setItem('flappy_bird_high_score', this.highScore);
-            }
+        
+            
         }
     }
 
@@ -184,4 +200,18 @@ window.addEventListener('DOMContentLoaded', function() {
     if (birdUp.complete) onImageLoad();
     if (birdMid.complete) onImageLoad();
     if (birdDown.complete) onImageLoad();
+
+    
+    // Nasłuchiwacz zdarzeń dla przycisku resetowania
+    document.getElementById('resetButton').addEventListener('click', () => {
+        if (game) {
+            game.resetHighScore();
+            game.playResetSound();
+
+            // Ustawienie krótkiego timeoutu, aby przycisk nie pozostawał "wciśnięty"
+            setTimeout(() => {
+                document.getElementById('resetButton').blur();
+            }, 100);
+        }
+    });
 });

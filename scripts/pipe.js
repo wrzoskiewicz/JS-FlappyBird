@@ -7,10 +7,11 @@ export class Pipe {
         this.height = 320;  // Wysokość rury, dostosuj do rzeczywistej wysokości obrazka
         this.top = top;
         this.image = document.getElementById('pipe-green');
+        this.pipeSpeed = this.game.pipeSpeed; // Prędkość rury równa prędkości gry
     }
 
     update() {
-        this.x -= 2; // Przesuwaj rurę w lewo (dostosuj prędkość do potrzeb)
+        this.x -= this.pipeSpeed; // Przesuwaj rurę w lewo z prędkością gry
     }
 
     draw(context) {

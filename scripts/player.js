@@ -6,7 +6,9 @@ export class Player {
         this.x = 280;
         this.y = (this.game.height - this.height) * 0.5;
         this.fallSpeed = 0;
-        this.maxSpeed = 8; // Maksymalna prędkość opadania
+        this.gravity = 0.2; // Wartość grawitacji
+        this.maxSpeed = 3; // Maksymalna prędkość opadania
+        this.jumpSpeed = -3; // Prędkość skoku
         this.birdImages = [
             document.getElementById('player-up'),
             document.getElementById('player-mid'),
@@ -15,16 +17,16 @@ export class Player {
         this.currentBirdImageIndex = 1; // Indeks obecnego obrazu ptaka
         this.spacePressed = false; // Zmienna śledząca stan spacji
         this.animationTimer = 0; // Timer do animacji
-        this.animationInterval = 5; // Czas pomiędzy klatkami animacji
+        this.animationInterval = 10; // Czas pomiędzy klatkami animacji
     }
 
     update(input) {
-        if (this.fallSpeed < this.maxSpeed) {
-            this.fallSpeed += 1;
+        if (!input.includes(' ') && this.fallSpeed < this.maxSpeed) {
+            this.fallSpeed += this.gravity;
         }
 
         if (input.includes(' ') && !this.spacePressed && !this.animating) {
-            this.fallSpeed = -10;
+            this.fallSpeed = this.jumpSpeed;
             this.spacePressed = true;
             this.startAnimation();
         } else if (!input.includes(' ')) {

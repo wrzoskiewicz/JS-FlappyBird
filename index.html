@@ -9,15 +9,22 @@
 <body>
     <canvas id="canvas1"></canvas>
 
-    <img id="player" src="assets/bluebird-midflap.png">
+    <img id="player-up" src="assets/bluebird-upflap.png" style="display:none">
+    <img id="player-mid" src="assets/bluebird-midflap.png" style="display:none">
+    <img id="player-down" src="assets/bluebird-downflap.png" style="display:none">
     <img id="pipe-green" src="assets/pipe-green.png" style="display:none;">
     <img id="base" src="assets/base.png" style="display:none;">
-    <img id="message" src="assets/message.png" style="display:none;">
+    <img id="start" src="assets/message.png" style="display:none;">
+    <img id="gameOver" src="assets/gameover.png" style="display:none;">
     <img id="background-day" src="assets/background-day.png" style="display:none;">
     <img id="background-night" src="assets/background-night.png" style="display:none;">
+    <button id="resetButton">Resetuj rekord</button>
+    <h1 id="message">Naciśnij Spację, aby zacząć grę</h1>
+    
     <audio id="soundtrack" src="audio/soundtrack.m4a" loop></audio>
-    <button id="startButton">Rozpocznij grę</button>
+    <audio id="pointSound" src="audio/point.wav"></audio>
+    <audio id="hitSound" src="audio/hit.wav"></audio>
 
-    <script type="module" src="js/main.js"></script>
+    <script type="module" src="scripts/main.js"></script>
 </body>
 </html>

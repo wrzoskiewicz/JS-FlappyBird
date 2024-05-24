@@ -30,4 +30,8 @@ export class PipeManager {
         const baseImage = document.getElementById('base');
         context.drawImage(baseImage, 0, this.game.height - this.baseHeight, this.game.width, this.baseHeight);
     }
+
+    clearPipes() {
+        this.pipes = []; // Czyścimy tablicę rur
+    }
 }
